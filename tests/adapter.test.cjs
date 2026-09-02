@@ -72,7 +72,7 @@ test('Markdown sender uses passive reply metadata and falls back to text on API 
   assert.equal(payloads[0].msg_id, 'message-1')
   assert.equal(payloads[0].msg_seq, 1)
   assert.equal(payloads[0].markdown.content, '<@member-openid>\n金币 \\*100\\*')
-  assert.equal(qq.compactMarkdown('金币：100\n登神分：20'), '**金币** · 100\n**登神分** · 20')
+  assert.equal(qq.compactMarkdown('金币：100\n登神分：20'), '**金币：** 100\n**登神分：** 20')
   const failedSession = groupSession()
   failedSession.bot.internal.sendMessage = async () => { throw new Error('api failure') }
   failedSession.send = async (content) => fallback.push(content)

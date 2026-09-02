@@ -15,6 +15,7 @@ export class QqMessageSender implements QqSender {
   constructor(ctx: Context, private allowProactiveMessages = false) { this.logger = ctx.logger("faith-adapter-qq-message"); }
 
   sendResult(session: Session, result: BusinessResult) {
+    if (result.type === "silent") return Promise.resolve(undefined);
     const options = { proactiveRequired: result.delivery === "proactive-required" };
     if (result.type === "text") return this.sendText(session, result.content, options);
     if (result.type === "image") return this.sendImage(session, result.url, result.fallback, options);
@@ -97,7 +98,7 @@ export function compactMarkdown(value: string) {
   return value.split("\n").map((line) => {
     const match = line.trim().match(/^([^：:]{1,12})[：:]\s*(.+)$/);
     if (!match) return escapeMarkdown(line.trim());
-    return `**${escapeMarkdown(match[1])}** · ${escapeMarkdown(match[2])}`;
+    return `**${escapeMarkdown(match[1])}：** ${escapeMarkdown(match[2])}`;
   }).filter(Boolean).join("\n");
 }
 function delay(ms: number) { return new Promise<void>((resolve) => setTimeout(resolve, ms)); }
