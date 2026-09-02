@@ -31,7 +31,7 @@ test('panel contains Faith tree before Void Prayer tree and remains below offici
   assert.ok(qq.FAITH_QQ_PANEL_COMMANDS.length <= 20)
   assert.deepEqual(qq.FAITH_QQ_PANEL_COMMANDS.map((item) => item[0]), [
     '信仰', '信仰 信息', '信仰 注册', '信仰 弃誓', '信仰 职业', '信仰 变更职业',
-    '信仰管理 数值', '虚空祈求', '虚空祈求 次数',
+    '信仰管理 数值', '虚空祈求', '虚空祈求 次数', '称号',
   ])
 })
 

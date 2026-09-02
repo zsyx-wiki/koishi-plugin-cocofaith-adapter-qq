@@ -8,6 +8,7 @@ export const FAITH_QQ_PANEL_COMMANDS = Object.freeze([
   ["信仰 弃誓", "变更当前信仰", false], ["信仰 职业", "查看或选择职业", false], ["信仰 变更职业", "付费变更职业", false],
   ["信仰管理 数值", "调整玩家业务数值", true],
   ["虚空祈求", "消耗金币抽取物品", false], ["虚空祈求 次数", "查看今日祈求次数", false],
+  ["称号", "查看称号命令", false],
 ] as const);
 
 export function applyCommandPanel(ctx: Context, config: QqPanelConfig) {
