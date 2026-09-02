@@ -1,0 +1,37 @@
+{
+  "name": "@mueo/koishi-plugin-faith-adapter-qq",
+  "version": "3.0.0-alpha.1",
+  "description": "Faith v3 QQ 官方机器人平台接入",
+  "author": "Mueo <mueo@mueoo.com>",
+  "main": "lib/index.js",
+  "module": "lib/index.mjs",
+  "typings": "lib/index.d.ts",
+  "files": [
+    "lib"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup -w",
+    "test": "npm run build && node --test tests/*.test.cjs"
+  },
+  "peerDependencies": {
+    "@mueo/koishi-plugin-faith-core": "^3.0.0-alpha.1",
+    "@mueo/koishi-plugin-faith-business": "^3.0.0-alpha.1",
+    "koishi": "^4.16.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2"
+  },
+  "license": "GPL-3.0-or-later",
+  "koishi": {
+    "name": "Faith Adapter QQ",
+    "services": {
+      "required": [
+        "faithCore",
+        "faithBusiness"
+      ]
+    }
+  }
+}
