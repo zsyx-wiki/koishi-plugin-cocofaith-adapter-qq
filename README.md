@@ -14,10 +14,13 @@ Faith v3 的 QQ 官方机器人适配
 - `creatorGroupIdentities`：创造者的 `group_openid/member_openid` 配对。
 - `commandPanel.groupId`：展示指令面板的群 `group_openid`。
 - `allowProactiveMessages`：是否接受 Business 要求的主动消息，默认关闭。
+- `receiveMode`：群聊接收模式，`mention`（只接受艾特，默认）或 `all`（全部接收）。
 
 ## 消息行为
 
-- 群聊只有明确艾特机器人时才进入 Faith。
+- 群聊默认只处理艾特机器人的命令；切换为“全部接收”后，不艾特也可以使用命令。
+- 全部接收需要 QQ 平台实际下发全量群消息，配置本身不会开通事件权限。
+- 普通聊天先经过 Business 命令索引筛选，不查询 UID、不执行玩法。业务启停后索引随之更新。
 - 私聊消息直接处理。
 - 回复会艾特发起用户。
 - 默认只发一条紧凑 Markdown；超长内容截断。

@@ -4,6 +4,7 @@ export const AUTHOR_USER_OPENID = "3F0DEF52BA72AAA03F724C0561421242";
 export const AUTHOR_GROUP_OPENID = "730DC6DE5344BEABAAB46D74A20231FD";
 
 export interface Config {
+  receiveMode: "mention" | "all";
   creatorUserOpenids: string[];
   creatorGroupIdentities: Array<{ groupOpenid: string; memberOpenid: string }>;
   commandPanel: { enabled: boolean; groupId: string };
@@ -11,6 +12,10 @@ export interface Config {
 }
 
 export const Config: Schema<Config> = Schema.object({
+  receiveMode: Schema.union([
+    Schema.const("mention").description("只接受艾特"),
+    Schema.const("all").description("全部接收"),
+  ]).default("mention").description("群聊消息接收模式，默认只接受艾特。全部接收也只处理 Faith 命令；需 QQ 平台提供全量群消息事件。私聊不受此项影响。"),
   creatorUserOpenids: Schema.array(Schema.string()).default([AUTHOR_USER_OPENID]).description("必须修改：创造者私聊 user_openid。内置值是插件作者的 ID。"),
   creatorGroupIdentities: Schema.array(Schema.object({
     groupOpenid: Schema.string().required(),

@@ -35,9 +35,9 @@ export function apply(ctx: Context, config: Config) {
   applyCommandPanel(ctx, config.commandPanel);
   ctx.middleware(async (session, next) => {
     if (session.platform !== "qq") return next();
-    if (!isQqAddressed(session)) return next();
+    if (!isQqAddressed(session, config.receiveMode)) return next();
     const content = normalizeQqContent(session);
-    if (!isFaithCommand(ctx, content)) return next();
+    if (!ctx.faithBusiness.acceptsCommand(content)) return next();
     let handled: boolean;
     try { handled = await dispatchQqSession(ctx, session, sender, content); }
     catch (error) {
@@ -50,8 +50,8 @@ export function apply(ctx: Context, config: Config) {
   logger.info(`QQ Adapter 已加载（创造者私聊身份 ${config.creatorUserOpenids.length} 个，群身份 ${config.creatorGroupIdentities.length} 个，指令面板 ${config.commandPanel.enabled ? "开启" : "关闭"}）`);
 }
 
-export function isQqAddressed(session: Session) {
-  return session.isDirect || !!session.stripped?.appel;
+export function isQqAddressed(session: Session, mode: Config["receiveMode"] = "mention") {
+  return mode === "all" || session.isDirect || !!session.stripped?.appel;
 }
 
 export async function dispatchQqSession(ctx: Context, session: Session, sender: QqSender, normalizedContent?: string) {
@@ -70,16 +70,10 @@ export async function dispatchQqSession(ctx: Context, session: Session, sender: 
   return true;
 }
 
-function isFaithCommand(ctx: Context, content: string) {
-  const first = content.trim().replace(/^[/／]+\s*/, "").split(/\s+/, 1)[0]?.toLocaleLowerCase();
-  if (!first) return false;
-  const commands = ctx.faithBusiness.commands();
-  if (!commands.length) return true;
-  return commands.some(({ command }) => command.commands.some((alias) => alias.trim().replace(/^\/+/, "").toLocaleLowerCase() === first));
-}
 function assertDependencies(ctx: Context) {
   if (typeof ctx.faithCore?.adapter?.resolve !== "function") throw new Error("faith-adapter-qq 需要已就绪的 faith-core 身份服务");
   if (typeof ctx.faithBusiness?.dispatch !== "function") throw new Error("faith-adapter-qq 需要已就绪的 faith-business 路由服务");
+  if (typeof ctx.faithBusiness?.acceptsCommand !== "function") throw new Error("请同步更新 faith-business，以提供命令快速筛选接口");
 }
 export * from "./types";
 export * from "./identity";

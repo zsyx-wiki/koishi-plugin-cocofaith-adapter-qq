@@ -39,11 +39,45 @@ test('QQ group messages require an explicit mention while private messages do no
   const session = groupSession('信仰 信息')
   session.stripped.appel = false
   assert.equal(qq.isQqAddressed(session), false)
+  assert.equal(qq.isQqAddressed(session, 'all'), true)
   session.stripped.appel = true
   assert.equal(qq.isQqAddressed(session), true)
   session.isDirect = true
   session.stripped.appel = false
   assert.equal(qq.isQqAddressed(session), true)
+})
+
+test('receive mode defaults to mention and validates choices', () => {
+  const { Schema } = require('koishi')
+  const config = new Schema(qq.Config)
+  assert.equal(config({}).receiveMode, 'mention')
+  assert.equal(config({ receiveMode: 'all' }).receiveMode, 'all')
+  assert.throws(() => config({ receiveMode: 'invalid' }))
+})
+
+test('all mode filters chat before identity lookup and accepts unmentioned commands', async () => {
+  let middleware, resolved = 0, dispatched = 0, next = 0
+  const ctx = {
+    logger: () => ({ info() {}, warn() {}, error() {} }), on() {},
+    middleware(fn) { middleware = fn },
+    faithCore: {
+      permissions: { register: () => ({ dispose() {} }) },
+      adapter: { resolve: async () => { resolved++; return 10000000 } },
+    },
+    faithBusiness: {
+      acceptsCommand: (content) => content === '/信仰 信息',
+      dispatch: async () => { dispatched++; return { matched: true, result: { type: 'silent' } } },
+    },
+  }
+  qq.apply(ctx, { receiveMode: 'all', creatorUserOpenids: [], creatorGroupIdentities: [], commandPanel: { enabled: false }, allowProactiveMessages: false })
+  await middleware(groupSession('今天聊点什么'), async () => { next++ })
+  assert.equal(resolved, 0)
+  assert.equal(dispatched, 0)
+  assert.equal(next, 1)
+  await middleware(groupSession('/信仰 信息'), async () => { next++ })
+  assert.equal(resolved, 1)
+  assert.equal(dispatched, 1)
+  assert.equal(next, 1)
 })
 
 test('QQ session resolves UID, dispatches normalized event and renders result', async () => {
