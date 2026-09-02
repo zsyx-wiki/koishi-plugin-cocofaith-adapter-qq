@@ -53,7 +53,7 @@ export class QqMessageSender implements QqSender {
     try { return await method.call(internal, session.channelId, payload); }
     catch (error) {
       this.logger.warn(`QQ Markdown 发送失败，降级为纯文本：${error instanceof Error ? error.message : String(error)}`);
-      return session.send(session.isDirect ? content : [h.at(session.userId), " ", content]);
+      return session.send(session.isDirect ? content : [h.at(session.userId), "\n", content]);
     }
   }
 
@@ -112,5 +112,5 @@ function withMention(session: Session, content: string) {
   if (session.isDirect) return content;
   const raw = (session as QqSession).qq?.d;
   const id = raw?.member_openid || raw?.author?.member_openid || raw?.author?.id || session.userId;
-  return id ? `<@${id}> ${content}` : content;
+  return id ? `<@${id}>\n${content}` : content;
 }

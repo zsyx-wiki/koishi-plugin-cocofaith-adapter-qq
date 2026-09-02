@@ -6,7 +6,6 @@ const LEGACY_REMARK = "faith-qq-command-panel";
 export const FAITH_QQ_PANEL_COMMANDS = Object.freeze([
   ["信仰", "查看信仰信息", false], ["信仰 信息", "查看信仰信息", false], ["信仰 注册", "注册一个信仰", false],
   ["信仰 弃誓", "变更当前信仰", false], ["信仰 职业", "查看或选择职业", false], ["信仰 变更职业", "付费变更职业", false],
-  ["信仰 卖出", "出售指定物品", false], ["信仰 卖出等级", "按等级出售并各保留一个", false], ["信仰 全卖等级", "按等级出售全部物品", false],
   ["信仰管理 数值", "调整玩家业务数值", true],
   ["虚空祈求", "消耗金币抽取物品", false], ["虚空祈求 次数", "查看今日祈求次数", false],
 ] as const);

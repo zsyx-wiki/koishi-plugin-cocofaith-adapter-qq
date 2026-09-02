@@ -23,11 +23,15 @@ test('QQ command content removes bot mention and normalizes full-width slash', (
   assert.equal(qq.normalizeQqContent(session), '/虚空祈求 10')
 })
 
+test('specific not-found business messages are not hidden by the adapter', () => {
+  assert.equal(qq.friendlyBusinessError({ code: 'NOT_FOUND', message: '没有可出售的 C 级物品。' }), '没有可出售的 C 级物品。')
+})
+
 test('panel contains Faith tree before Void Prayer tree and remains below official limit', () => {
   assert.ok(qq.FAITH_QQ_PANEL_COMMANDS.length <= 20)
   assert.deepEqual(qq.FAITH_QQ_PANEL_COMMANDS.map((item) => item[0]), [
     '信仰', '信仰 信息', '信仰 注册', '信仰 弃誓', '信仰 职业', '信仰 变更职业',
-    '信仰 卖出', '信仰 卖出等级', '信仰 全卖等级', '信仰管理 数值', '虚空祈求', '虚空祈求 次数',
+    '信仰管理 数值', '虚空祈求', '虚空祈求 次数',
   ])
 })
 
@@ -67,7 +71,7 @@ test('Markdown sender uses passive reply metadata and falls back to text on API 
   await sender.sendText(session, '金币 *100*')
   assert.equal(payloads[0].msg_id, 'message-1')
   assert.equal(payloads[0].msg_seq, 1)
-  assert.equal(payloads[0].markdown.content, '<@member-openid> 金币 \\*100\\*')
+  assert.equal(payloads[0].markdown.content, '<@member-openid>\n金币 \\*100\\*')
   assert.equal(qq.compactMarkdown('金币：100\n登神分：20'), '**金币** · 100\n**登神分** · 20')
   const failedSession = groupSession()
   failedSession.bot.internal.sendMessage = async () => { throw new Error('api failure') }
