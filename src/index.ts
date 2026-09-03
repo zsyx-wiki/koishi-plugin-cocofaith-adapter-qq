@@ -23,6 +23,7 @@ export function apply(ctx: Context, config: Config) {
   assertDependencies(ctx);
   const logger = ctx.logger("faith-adapter-qq");
   const sender = new QqMessageSender(ctx, config.allowProactiveMessages);
+  ctx.on("dispose", () => sender.dispose());
   const creatorPolicy = ctx.faithCore.permissions.register("faith.creator", async ({ uid }) => {
     const identities = [
       ...config.creatorUserOpenids.map((value) => ({ adapter: "qqbot", type: "qqbot_user_openid", value, scope: "private_chat" } as const)),
@@ -63,6 +64,9 @@ export async function dispatchQqSession(ctx: Context, session: Session, sender: 
   const response = await ctx.faithBusiness.dispatch({
     uid: await ctx.faithCore.adapter.resolve(identity), identity,
     scene: session.isDirect ? "private" : "group", content: normalizedContent ?? normalizeQqContent(session), channelId: session.channelId,
+    roomKey: JSON.stringify(["qq", session.selfId, session.channelId]),
+    eventId: session.messageId, displayName: session.username,
+    reply: (result) => sender.sendResult(session, result),
   });
   if (!response.matched) return false;
   if ("error" in response) await sender.sendText(session, friendlyBusinessError(response.error));

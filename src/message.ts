@@ -5,16 +5,21 @@ import type { QqSendOptions, QqSender, QqSession } from "./types";
 const PASSIVE_WINDOW_MS = 5 * 60 * 1_000 - 2_000;
 const MARKDOWN_CHUNK = 3_800;
 const MAX_CHUNKS = 1;
+const MAX_REPLIES = 5;
 const SEND_INTERVAL_MS = 120;
 
 export class QqMessageSender implements QqSender {
   private readonly logger;
   private queues = new Map<string, Promise<unknown>>();
   private lastSent = new Map<string, number>();
-  private sequences = new WeakMap<object, number>();
+  private sequences = new Map<string, { count: number; expires: number }>();
+  private received = new WeakMap<object, number>();
+  private disposed = false;
+  dispose() { this.disposed = true; this.sequences.clear(); this.lastSent.clear(); }
   constructor(ctx: Context, private allowProactiveMessages = false) { this.logger = ctx.logger("faith-adapter-qq-message"); }
 
   sendResult(session: Session, result: BusinessResult) {
+    // broadcast 是其他平台的可选公告；QQ 只发送包含升级信息的本群正文。
     if (result.type === "silent") return Promise.resolve(undefined);
     const options = { proactiveRequired: result.delivery === "proactive-required" };
     if (result.type === "text") return this.sendText(session, result.content, options);
@@ -38,23 +43,24 @@ export class QqMessageSender implements QqSender {
   }
 
   private async sendMarkdownOrText(session: Session, content: string, options: QqSendOptions) {
-    if (!this.canDeliver(session, options)) return;
     await this.throttle(session);
+    if (!this.canDeliver(session, options)) return;
     const internal = session.bot.internal as any;
     const method = session.isDirect ? internal?.sendPrivateMessage : internal?.sendMessage;
-    if (typeof method !== "function") return session.send(content);
-    const passive = isPassive(session);
-    const sequence = (this.sequences.get(session) ?? 0) + 1;
-    this.sequences.set(session, sequence);
+    if (typeof method !== "function") {
+      if (!this.reserve(session, options)) return;
+      return session.send(content);
+    }
     const rendered = withMention(session, compactMarkdown(content));
-    const payload: Record<string, unknown> = { content: "markdown", msg_type: 2, markdown: { content: rendered } };
-    if (passive && sequence <= MAX_CHUNKS) { payload.msg_id = session.messageId; payload.msg_seq = sequence; }
-    else if (options.proactiveRequired && this.allowProactiveMessages && (session as QqSession).qq?.id) payload.event_id = (session as QqSession).qq!.id;
-    else return;
+    const credentials = this.reserve(session, options);
+    if (!credentials) return;
+    const payload = { msg_type: 2, markdown: { content: rendered }, ...credentials };
     try { return await method.call(internal, session.channelId, payload); }
     catch (error) {
       this.logger.warn(`QQ Markdown 发送失败，降级为纯文本：${error instanceof Error ? error.message : String(error)}`);
-      return session.send(session.isDirect ? content : [h.at(session.userId), "\n", content]);
+      const fallback = this.reserve(session, options);
+      if (!fallback) return;
+      return method.call(internal, session.channelId, { msg_type: 0, content: withMention(session, content), ...fallback });
     }
   }
 
@@ -71,7 +77,35 @@ export class QqMessageSender implements QqSender {
     if (node.type === "text") return this.sendMarkdownOrText(session, node.content, options);
     await this.throttle(session); return session.send(h.image(node.url));
   }
-  private canDeliver(session: Session, options: QqSendOptions) { return isPassive(session) || (!!options.proactiveRequired && this.allowProactiveMessages); }
+  private credential(session: Session) {
+    const key = JSON.stringify([session.bot.sid, session.channelId, session.messageId]);
+    let value = this.sequences.get(key);
+    if (!value) {
+      let timestamp = session.timestamp;
+      if (timestamp) timestamp = timestamp < 10_000_000_000 ? timestamp * 1_000 : timestamp;
+      else { timestamp = this.received.get(session) ?? Date.now(); this.received.set(session, timestamp); }
+      value = { count: 0, expires: timestamp + PASSIVE_WINDOW_MS };
+      if (this.sequences.size >= 10000) for (const [id, entry] of this.sequences) if (entry.expires <= Date.now()) this.sequences.delete(id);
+      // 容量满时拒绝新凭证，不能清除仍有效的计数导致重复回复。
+      if (this.sequences.size >= 10000) return { count: MAX_REPLIES, expires: 0 };
+      this.sequences.set(key, value);
+    }
+    return value;
+  }
+  private canDeliver(session: Session, options: QqSendOptions) {
+    if (this.disposed) return false;
+    const value = this.credential(session);
+    return (!!session.messageId && Date.now() < value.expires && value.count < MAX_REPLIES)
+      || (!!options.proactiveRequired && this.allowProactiveMessages);
+  }
+  private reserve(session: Session, options: QqSendOptions): Record<string, unknown> | null {
+    if (this.disposed) return null;
+    const value = this.credential(session);
+    if (session.messageId && Date.now() < value.expires && value.count < MAX_REPLIES) {
+      return { msg_id: session.messageId, msg_seq: ++value.count };
+    }
+    return options.proactiveRequired && this.allowProactiveMessages ? {} : null;
+  }
   private async throttle(session: Session) {
     const key = `${session.bot.sid}:${session.channelId}`, wait = SEND_INTERVAL_MS - (Date.now() - (this.lastSent.get(key) ?? 0));
     if (wait > 0) await delay(wait);
@@ -102,13 +136,6 @@ export function compactMarkdown(value: string) {
   }).filter(Boolean).join("\n");
 }
 function delay(ms: number) { return new Promise<void>((resolve) => setTimeout(resolve, ms)); }
-function isPassive(session: Session) {
-  if (!session.messageId) return false;
-  if (!session.timestamp) return true;
-  const timestamp = session.timestamp < 10_000_000_000 ? session.timestamp * 1_000 : session.timestamp;
-  const age = Date.now() - timestamp;
-  return age >= 0 && age < PASSIVE_WINDOW_MS;
-}
 function withMention(session: Session, content: string) {
   if (session.isDirect) return content;
   const raw = (session as QqSession).qq?.d;

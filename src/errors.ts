@@ -13,6 +13,6 @@ const FRIENDLY_ERRORS: Readonly<Record<string, string>> = Object.freeze({
   INTERNAL_ERROR: "处理命令时发生问题，请稍后重试。",
 });
 export function friendlyBusinessError(error: { code: string; message: string }) {
-  if (["INSUFFICIENT_RESOURCE", "LIMIT_REACHED", "UNREGISTERED", "INVALID_INPUT", "NOT_FOUND"].includes(error.code) && error.message) return error.message;
+  if (["INSUFFICIENT_RESOURCE", "LIMIT_REACHED", "UNREGISTERED", "INVALID_INPUT", "NOT_FOUND", "NOT_ALLOWED", "CONFLICT", "ROOM_OCCUPIED"].includes(error.code) && error.message) return error.message;
   return FRIENDLY_ERRORS[error.code] ?? error.message ?? FRIENDLY_ERRORS.INTERNAL_ERROR;
 }
