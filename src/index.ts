@@ -2,9 +2,9 @@ import { Context, Session } from "koishi";
 import { Config as ConfigSchema, type Config as QqConfig } from "../config";
 import type {} from "@mueo/koishi-plugin-faith-core";
 import type {} from "@mueo/koishi-plugin-faith-business";
-import { QqMessageSender } from "./message";
-import { qqbotIdentity } from "./identity";
-import { normalizeQqContent } from "./content";
+import { QqMessageSender } from "./messaging/sender";
+import { qqbotIdentity } from "./session/identity";
+import { normalizeQqContent } from "./session/content";
 import { friendlyBusinessError } from "./errors";
 import { applyCommandPanel } from "./panel";
 import type { QqSender } from "./types";
@@ -80,8 +80,8 @@ function assertDependencies(ctx: Context) {
   if (typeof ctx.faithBusiness?.acceptsCommand !== "function") throw new Error("请同步更新 faith-business，以提供命令快速筛选接口");
 }
 export * from "./types";
-export * from "./identity";
-export * from "./content";
+export * from "./session/identity";
+export * from "./session/content";
 export * from "./errors";
-export * from "./message";
+export * from "./messaging/sender";
 export * from "./panel";

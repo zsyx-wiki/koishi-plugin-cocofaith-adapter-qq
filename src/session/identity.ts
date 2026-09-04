@@ -1,6 +1,6 @@
 import type { Session } from "koishi";
 import type { IdentityInput } from "@mueo/koishi-plugin-faith-core";
-import type { QqSession, RawQqMessage } from "./types";
+import type { QqSession, RawQqMessage } from "../types";
 
 function first(...values: unknown[]) { return values.find((value): value is string => typeof value === "string" && !!value.trim())?.trim(); }
 export function rawQqMessage(session: Session): RawQqMessage | undefined { return (session as QqSession).qq?.d; }

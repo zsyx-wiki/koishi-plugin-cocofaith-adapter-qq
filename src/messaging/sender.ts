@@ -1,6 +1,6 @@
 import { h, type Context, type Session } from "koishi";
 import type { BusinessResult, MessageNode } from "@mueo/koishi-plugin-faith-business";
-import type { QqSendOptions, QqSender, QqSession } from "./types";
+import type { QqSendOptions, QqSender, QqSession } from "../types";
 
 const PASSIVE_WINDOW_MS = 5 * 60 * 1_000 - 2_000;
 const MARKDOWN_CHUNK = 3_800;

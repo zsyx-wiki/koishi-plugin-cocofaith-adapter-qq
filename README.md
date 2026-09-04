@@ -4,6 +4,20 @@ Faith v3 的 QQ 官方机器人适配
 
 用于对接 `koishi-plugin-adapter-qq`
 
+## 源码结构
+
+```text
+src/
+├── session/            # QQ 事件内容与身份解析
+├── messaging/          # Markdown、纯文本降级与发送额度
+├── panel/              # QQ 群指令面板同步
+├── errors.ts           # Business 错误提示映射
+├── types.ts            # QQ Adapter 公共类型
+└── index.ts            # 固定接入流程与 Koishi 插件入口
+```
+
+平台事件只在 `session` 中转换，Business 结果只在 `messaging` 中渲染。新增玩法不应改动此插件。
+
 ## 使用前配置
 
 > 创造者和群组的默认值属于@Mueo。部署自己的机器人前必须修改，否则你不会拥有创造者权限，指令面板也会同步到错误的群
