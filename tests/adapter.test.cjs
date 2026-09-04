@@ -48,7 +48,7 @@ test('panel contains Faith tree before Void Prayer tree and remains below offici
   assert.ok(qq.FAITH_QQ_PANEL_COMMANDS.length <= 20)
   assert.deepEqual(qq.FAITH_QQ_PANEL_COMMANDS.map((item) => item[0]), [
     '信仰', '信仰 信息', '信仰 注册', '信仰 弃誓', '信仰 职业', '信仰 变更职业',
-    '信仰管理 数值', '虚空祈求', '虚空祈求 次数', '称号',
+    '信仰管理 数值', '虚空祈求', '虚空祈求 次数', '称号', '关于椰子水',
   ])
 })
 
@@ -109,6 +109,7 @@ test('QQ session resolves UID, dispatches normalized event and renders result', 
   assert.equal(event.uid, 10000001)
   assert.equal(event.content, '/虚空祈求 2')
   assert.equal(event.scene, 'group')
+  assert.deepEqual(event.adapter, { name: 'CoCoFaith Adapter QQ', version: require('../package.json').version })
   assert.deepEqual(sent, { type: 'text', content: '完成' })
 })
 

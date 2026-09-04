@@ -6,4 +6,4 @@ export interface RawQqMessage {
 }
 export type QqSession = Session & { qq?: { id?: string; d?: RawQqMessage } };
 export interface QqSendOptions { proactiveRequired?: boolean; }
-export interface QqSender { sendText(session: Session, content: string, options?: QqSendOptions): Promise<unknown>; sendResult(session: Session, result: import("@mueo/koishi-plugin-faith-business").BusinessResult): Promise<unknown>; }
+export interface QqSender { sendText(session: Session, content: string, options?: QqSendOptions): Promise<unknown>; sendResult(session: Session, result: import("@mueo/koishi-plugin-cocofaith-business").BusinessResult): Promise<unknown>; }

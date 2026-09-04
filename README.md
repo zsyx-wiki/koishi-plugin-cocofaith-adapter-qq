@@ -1,6 +1,6 @@
-# Faith Adapter QQ
+# CoCoFaith Adapter QQ
 
-Faith v3 的 QQ 官方机器人适配
+CoCoFaith v3 的 QQ 官方机器人适配
 
 用于对接 `koishi-plugin-adapter-qq`
 

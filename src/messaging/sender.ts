@@ -1,5 +1,5 @@
 import { h, type Context, type Session } from "koishi";
-import type { BusinessResult, MessageNode } from "@mueo/koishi-plugin-faith-business";
+import type { BusinessResult, MessageNode } from "@mueo/koishi-plugin-cocofaith-business";
 import type { QqSendOptions, QqSender, QqSession } from "../types";
 
 const PASSIVE_WINDOW_MS = 5 * 60 * 1_000 - 2_000;
@@ -16,7 +16,7 @@ export class QqMessageSender implements QqSender {
   private received = new WeakMap<object, number>();
   private disposed = false;
   dispose() { this.disposed = true; this.sequences.clear(); this.lastSent.clear(); }
-  constructor(ctx: Context, private allowProactiveMessages = false) { this.logger = ctx.logger("faith-adapter-qq-message"); }
+  constructor(ctx: Context, private allowProactiveMessages = false) { this.logger = ctx.logger("cocofaith-adapter-qq-message"); }
 
   sendResult(session: Session, result: BusinessResult) {
     // broadcast 是其他平台的可选公告；QQ 只发送包含升级信息的本群正文。

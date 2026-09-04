@@ -1,7 +1,7 @@
 {
-  "name": "@mueo/koishi-plugin-faith-adapter-qq",
-  "version": "3.0.0-alpha.1",
-  "description": "Faith v3 QQ 官方机器人平台接入",
+  "name": "@mueo/koishi-plugin-cocofaith-adapter-qq",
+  "version": "3.0.0-alpha.2",
+  "description": "CoCoFaith v3 QQ 官方机器人平台接入",
   "author": "Mueo <mueo@mueoo.com>",
   "main": "lib/index.js",
   "module": "lib/index.mjs",
@@ -15,8 +15,8 @@
     "test": "npm run build && node --test tests/*.test.cjs"
   },
   "peerDependencies": {
-    "@mueo/koishi-plugin-faith-core": "^3.0.0-alpha.1",
-    "@mueo/koishi-plugin-faith-business": "^3.0.0-alpha.1",
+    "@mueo/koishi-plugin-cocofaith-core": "^3.0.0-alpha.2",
+    "@mueo/koishi-plugin-cocofaith-business": "^3.0.0-alpha.2",
     "koishi": "^4.16.0"
   },
   "devDependencies": {
@@ -26,7 +26,7 @@
   },
   "license": "GPL-3.0-or-later",
   "koishi": {
-    "name": "Faith Adapter QQ",
+    "name": "CoCoFaith Adapter QQ",
     "services": {
       "required": [
         "faithCore",

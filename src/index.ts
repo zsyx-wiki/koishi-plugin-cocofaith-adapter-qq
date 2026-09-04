@@ -1,15 +1,16 @@
 import { Context, Session } from "koishi";
 import { Config as ConfigSchema, type Config as QqConfig } from "../config";
-import type {} from "@mueo/koishi-plugin-faith-core";
-import type {} from "@mueo/koishi-plugin-faith-business";
+import type {} from "@mueo/koishi-plugin-cocofaith-core";
+import type {} from "@mueo/koishi-plugin-cocofaith-business";
 import { QqMessageSender } from "./messaging/sender";
 import { qqbotIdentity } from "./session/identity";
 import { normalizeQqContent } from "./session/content";
 import { friendlyBusinessError } from "./errors";
 import { applyCommandPanel } from "./panel";
 import type { QqSender } from "./types";
+import { COCOFAITH_QQ_ADAPTER_VERSION } from "./version";
 
-export const name = "faith-adapter-qq";
+export const name = "cocofaith-adapter-qq";
 export const inject = ["faithCore", "faithBusiness"] as const;
 export const Config = ConfigSchema;
 export type Config = QqConfig;
@@ -21,7 +22,7 @@ export async function resolveQqBotUid(ctx: Context, session: Session) {
 
 export function apply(ctx: Context, config: Config) {
   assertDependencies(ctx);
-  const logger = ctx.logger("faith-adapter-qq");
+  const logger = ctx.logger("cocofaith-adapter-qq");
   const sender = new QqMessageSender(ctx, config.allowProactiveMessages);
   ctx.on("dispose", () => sender.dispose());
   const creatorPolicy = ctx.faithCore.permissions.register("faith.creator", async ({ uid }) => {
@@ -66,6 +67,7 @@ export async function dispatchQqSession(ctx: Context, session: Session, sender: 
     scene: session.isDirect ? "private" : "group", content: normalizedContent ?? normalizeQqContent(session), channelId: session.channelId,
     roomKey: JSON.stringify(["qq", session.selfId, session.channelId]),
     eventId: session.messageId, displayName: session.username,
+    adapter: { name: "CoCoFaith Adapter QQ", version: COCOFAITH_QQ_ADAPTER_VERSION },
     reply: (result) => sender.sendResult(session, result),
   });
   if (!response.matched) return false;
@@ -75,9 +77,9 @@ export async function dispatchQqSession(ctx: Context, session: Session, sender: 
 }
 
 function assertDependencies(ctx: Context) {
-  if (typeof ctx.faithCore?.adapter?.resolve !== "function") throw new Error("faith-adapter-qq 需要已就绪的 faith-core 身份服务");
-  if (typeof ctx.faithBusiness?.dispatch !== "function") throw new Error("faith-adapter-qq 需要已就绪的 faith-business 路由服务");
-  if (typeof ctx.faithBusiness?.acceptsCommand !== "function") throw new Error("请同步更新 faith-business，以提供命令快速筛选接口");
+  if (typeof ctx.faithCore?.adapter?.resolve !== "function") throw new Error("CoCoFaith Adapter QQ 需要已就绪的 faithCore 身份服务");
+  if (typeof ctx.faithBusiness?.dispatch !== "function") throw new Error("CoCoFaith Adapter QQ 需要已就绪的 faithBusiness 路由服务");
+  if (typeof ctx.faithBusiness?.acceptsCommand !== "function") throw new Error("请同步更新 CoCoFaith Business，以提供命令快速筛选接口");
 }
 export * from "./types";
 export * from "./session/identity";
@@ -85,3 +87,4 @@ export * from "./session/content";
 export * from "./errors";
 export * from "./messaging/sender";
 export * from "./panel";
+export * from "./version";

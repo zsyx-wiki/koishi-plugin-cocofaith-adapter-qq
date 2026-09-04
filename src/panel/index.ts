@@ -9,13 +9,14 @@ export const FAITH_QQ_PANEL_COMMANDS = Object.freeze([
   ["信仰管理 数值", "调整玩家业务数值", true],
   ["虚空祈求", "消耗金币抽取物品", false], ["虚空祈求 次数", "查看今日祈求次数", false],
   ["称号", "查看称号命令", false],
+  ["关于椰子水", "查看运行架构与版本", false],
 ] as const);
 
 export function applyCommandPanel(ctx: Context, config: QqPanelConfig) {
   if (!config.enabled || !config.groupId) return;
   if (FAITH_QQ_PANEL_COMMANDS.length > 20) throw new Error("QQ 指令面板最多注册 20 条命令");
   validatePanelCommands(FAITH_QQ_PANEL_COMMANDS);
-  const logger = ctx.logger("faith-adapter-qq-panel"), synchronized = new WeakSet<object>(), pending = new WeakMap<object, Promise<void>>();
+  const logger = ctx.logger("cocofaith-adapter-qq-panel"), synchronized = new WeakSet<object>(), pending = new WeakMap<object, Promise<void>>();
   const panel = { remark: REMARK, items: FAITH_QQ_PANEL_COMMANDS.map(([name, desc, only_admin]) => ({ type: "command", name, desc, only_admin })) };
   const sync = (bot: any) => {
     if (!bot || bot.platform !== "qq" || synchronized.has(bot)) return Promise.resolve();

@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     "target": "es2022", "module": "NodeNext", "moduleResolution": "NodeNext", "declaration": true,
-    "esModuleInterop": true, "skipLibCheck": true, "types": ["node"], "baseUrl": ".",
+    "esModuleInterop": true, "resolveJsonModule": true, "skipLibCheck": true, "types": ["node"], "baseUrl": ".",
     "paths": {
-      "@mueo/koishi-plugin-faith-core": ["../koishi-plugin-faith-core/src/index.ts"],
-      "@mueo/koishi-plugin-faith-business": ["../koishi-plugin-faith-business/src/index.ts"]
+      "@mueo/koishi-plugin-cocofaith-core": ["../koishi-plugin-cocofaith-core/src/index.ts"],
+      "@mueo/koishi-plugin-cocofaith-business": ["../koishi-plugin-cocofaith-business/src/index.ts"]
     }
   },
   "include": ["src", "config.ts"]

@@ -1,5 +1,5 @@
 import type { Session } from "koishi";
-import type { IdentityInput } from "@mueo/koishi-plugin-faith-core";
+import type { IdentityInput } from "@mueo/koishi-plugin-cocofaith-core";
 import type { QqSession, RawQqMessage } from "../types";
 
 function first(...values: unknown[]) { return values.find((value): value is string => typeof value === "string" && !!value.trim())?.trim(); }
