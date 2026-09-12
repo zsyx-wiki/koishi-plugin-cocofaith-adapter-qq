@@ -4,7 +4,7 @@ import type {} from "@mueo/koishi-plugin-cocofaith-core";
 import type {} from "@mueo/koishi-plugin-cocofaith-business";
 import { QqMessageSender } from "./messaging/sender";
 import { qqbotIdentity } from "./session/identity";
-import { normalizeQqContent } from "./session/content";
+import { isCoconutWaterCommand, normalizeQqContent } from "./session/content";
 import { friendlyBusinessError } from "./errors";
 import { applyCommandPanel } from "./panel";
 import type { QqSender } from "./types";
@@ -23,6 +23,7 @@ export async function resolveQqBotUid(ctx: Context, session: Session) {
 export function apply(ctx: Context, config: Config) {
   assertDependencies(ctx);
   const logger = ctx.logger("cocofaith-adapter-qq");
+  const mode = config.mode ?? "binding";
   const sender = new QqMessageSender(ctx, config.allowProactiveMessages);
   ctx.on("dispose", () => sender.dispose());
   const creatorPolicy = ctx.faithCore.permissions.register("faith.creator", async ({ uid }) => {
@@ -34,11 +35,13 @@ export function apply(ctx: Context, config: Config) {
     return resolved.includes(uid);
   });
   ctx.on("dispose", () => creatorPolicy.dispose());
-  applyCommandPanel(ctx, config.commandPanel);
+  if (mode === "normal") applyCommandPanel(ctx, config.commandPanel);
   ctx.middleware(async (session, next) => {
     if (session.platform !== "qq") return next();
+    if (mode === "binding" && session.isDirect) return next();
     if (!isQqAddressed(session, config.receiveMode)) return next();
     const content = normalizeQqContent(session);
+    if (mode === "binding" && !isCoconutWaterCommand(content)) return next();
     if (!ctx.faithBusiness.acceptsCommand(content)) return next();
     let handled: boolean;
     try { handled = await dispatchQqSession(ctx, session, sender, content); }
@@ -49,7 +52,7 @@ export function apply(ctx: Context, config: Config) {
     }
     if (!handled) return next();
   });
-  logger.info(`QQ Adapter 已加载（创造者私聊身份 ${config.creatorUserOpenids.length} 个，群身份 ${config.creatorGroupIdentities.length} 个，指令面板 ${config.commandPanel.enabled ? "开启" : "关闭"}）`);
+  logger.info(`QQ Adapter 已加载（${mode === "binding" ? "绑定模式：仅群聊椰子水命令" : "正常模式：完整命令"}；创造者私聊身份 ${config.creatorUserOpenids.length} 个，群身份 ${config.creatorGroupIdentities.length} 个，指令面板 ${mode === "normal" && config.commandPanel.enabled ? "开启" : "关闭"}）`);
 }
 
 export function isQqAddressed(session: Session, mode: Config["receiveMode"] = "mention") {

@@ -9,4 +9,7 @@ export function normalizeQqContent(session: Session) {
   content = content.replace(/^／/, "/").replace(/^\/+\s*/, "/");
   return content;
 }
+export function isCoconutWaterCommand(content: string) {
+  return /^椰子水(?:\s|$)/.test(content.trimStart().replace(/^[/／]+\s*/, ""));
+}
 function escapeRegExp(value: string) { return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }

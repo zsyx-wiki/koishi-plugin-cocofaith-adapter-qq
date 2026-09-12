@@ -4,6 +4,7 @@ export const AUTHOR_USER_OPENID = "3F0DEF52BA72AAA03F724C0561421242";
 export const AUTHOR_GROUP_OPENID = "730DC6DE5344BEABAAB46D74A20231FD";
 
 export interface Config {
+  mode: "binding" | "normal";
   receiveMode: "mention" | "all";
   creatorUserOpenids: string[];
   creatorGroupIdentities: Array<{ groupOpenid: string; memberOpenid: string }>;
@@ -12,6 +13,10 @@ export interface Config {
 }
 
 export const Config: Schema<Config> = Schema.object({
+  mode: Schema.union([
+    Schema.const("binding").description("绑定模式（推荐）"),
+    Schema.const("normal").description("正常模式"),
+  ]).default("binding").description("绑定模式只在群聊处理“椰子水”命令，避免与 OneBot 重复回复；正常模式处理全部 Business 命令。"),
   receiveMode: Schema.union([
     Schema.const("mention").description("只接受艾特"),
     Schema.const("all").description("全部接收"),

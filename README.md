@@ -52,6 +52,7 @@ CoCoFaith Core
 
 | 配置 | 默认值 | 说明 |
 | --- | ---: | --- |
+| `mode` | `binding` | `binding` 仅在群聊处理“椰子水”命令；`normal` 处理完整命令 |
 | `receiveMode` | `mention` | 群聊消息接收模式，可选 `mention` 或 `all` |
 | `creatorUserOpenids` | 作者 ID | 创造者私聊 `user_openid` 列表 |
 | `creatorGroupIdentities` | 作者 ID | 创造者的 `group_openid` 与 `member_openid` 配对 |
@@ -60,6 +61,8 @@ CoCoFaith Core
 | `allowProactiveMessages` | `false` | 是否允许 Business 明确要求的主动消息 |
 
 `receiveMode: mention` 只处理艾特机器人的群消息。设置为 `all` 后可以处理未艾特命令，但 QQ 开放平台仍需向机器人下发全量群消息事件。
+
+绑定模式不会接收私聊命令，也不会同步完整玩法指令面板。同时运行 OneBot Adapter 时，建议只将其中一个 Adapter 设为 `normal`，另一个保留 `binding`。
 
 创造者群聊身份必须同时填写 `group_openid` 和该群内的 `member_openid`。只填写其中一项不能正确识别权限。
 

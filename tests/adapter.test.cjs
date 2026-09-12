@@ -67,7 +67,10 @@ test('QQ group messages require an explicit mention while private messages do no
 test('receive mode defaults to mention and validates choices', () => {
   const { Schema } = require('koishi')
   const config = new Schema(qq.Config)
+  assert.equal(config({}).mode, 'binding')
   assert.equal(config({}).receiveMode, 'mention')
+  assert.equal(config({ mode: 'normal' }).mode, 'normal')
+  assert.throws(() => config({ mode: 'invalid' }))
   assert.equal(config({ receiveMode: 'all' }).receiveMode, 'all')
   assert.throws(() => config({ receiveMode: 'invalid' }))
 })
@@ -86,7 +89,7 @@ test('all mode filters chat before identity lookup and accepts unmentioned comma
       dispatch: async () => { dispatched++; return { matched: true, result: { type: 'silent' } } },
     },
   }
-  qq.apply(ctx, { receiveMode: 'all', creatorUserOpenids: [], creatorGroupIdentities: [], commandPanel: { enabled: false }, allowProactiveMessages: false })
+  qq.apply(ctx, { mode: 'normal', receiveMode: 'all', creatorUserOpenids: [], creatorGroupIdentities: [], commandPanel: { enabled: false }, allowProactiveMessages: false })
   await middleware(groupSession('今天聊点什么'), async () => { next++ })
   assert.equal(resolved, 0)
   assert.equal(dispatched, 0)
@@ -95,6 +98,30 @@ test('all mode filters chat before identity lookup and accepts unmentioned comma
   assert.equal(resolved, 1)
   assert.equal(dispatched, 1)
   assert.equal(next, 1)
+})
+
+test('binding mode accepts only Coconut Water commands from groups', async () => {
+  let middleware, resolved = 0, dispatched = 0, next = 0
+  const ctx = {
+    logger: () => ({ info() {}, warn() {}, error() {} }), on() {},
+    middleware(fn) { middleware = fn },
+    faithCore: {
+      permissions: { register: () => ({ dispose() {} }) },
+      adapter: { resolve: async () => { resolved++; return 10000000 } },
+    },
+    faithBusiness: {
+      acceptsCommand: () => true,
+      dispatch: async () => { dispatched++; return { matched: true, result: { type: 'silent' } } },
+    },
+  }
+  const config = { mode: 'binding', receiveMode: 'all', creatorUserOpenids: [], creatorGroupIdentities: [], commandPanel: { enabled: true, groupId: 'group' }, allowProactiveMessages: false }
+  qq.apply(ctx, config)
+  await middleware(groupSession('信仰 信息'), async () => { next++ })
+  await middleware({ ...groupSession('椰子水 用户信息'), isDirect: true }, async () => { next++ })
+  await middleware(groupSession('椰子水 申请绑定 TokenA'), async () => { next++ })
+  assert.equal(next, 2)
+  assert.equal(resolved, 1)
+  assert.equal(dispatched, 1)
 })
 
 test('QQ session resolves UID, dispatches normalized event and renders result', async () => {
