@@ -137,7 +137,7 @@ test('QQ session resolves UID, dispatches normalized event and renders result', 
   assert.equal(event.uid, 10000001)
   assert.equal(event.content, '/虚空祈求 2')
   assert.equal(event.scene, 'group')
-  assert.deepEqual(event.adapter, { name: 'CoCoFaith Adapter QQ', version: require('../package.json').version })
+  assert.deepEqual(event.adapter, { name: 'CoCoFaith Adapter QQ', version: require('../package.json').version, allowRegistration: true })
   assert.deepEqual(sent, { type: 'text', content: '完成' })
 })
 

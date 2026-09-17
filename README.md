@@ -46,7 +46,9 @@ CoCoFaith Core
 
 ## 使用前配置
 
-> `creatorUserOpenids`、`creatorGroupIdentities` 和 `commandPanel.groupId` 内置的是作者测试账号与群组。部署前必须修改。
+> `creatorUserOpenids`、`creatorGroupIdentities` 和 `commandPanel.groupId` 内置的是作者测试账号与群组。
+>
+> 部署前必须修改！！！！
 
 配置定义位于根目录 [`config.ts`](./config.ts)。
 
@@ -97,7 +99,9 @@ scope_value: group_openid
 - 平台发送失败不会暂停 Business 中已经完成的操作
 - 全服公告不会自动转换为 QQ 主动广播
 
-只有 Business 明确将结果标记为必须主动发送，并且 `allowProactiveMessages` 已启用时，Adapter 才会尝试主动消息。是否能够发送仍受 QQ 开放平台权限和额度限制。
+只有 Business 明确将结果标记为必须主动发送，并且 `allowProactiveMessages` 已启用时，Adapter 才会尝试主动消息。
+
+是否能够发送仍受 QQ 开放平台权限和额度限制。
 
 ## 指令面板
 
