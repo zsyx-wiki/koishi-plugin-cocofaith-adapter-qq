@@ -1,6 +1,6 @@
-import type { Context, Session } from "koishi";
+import type { Session } from "koishi";
 import type { Config } from "../../config";
-import type { QqSender } from "../types";
+import type { QqAdapterContext, QqSender } from "../contracts";
 import { friendlyBusinessError } from "../errors";
 import { normalizeQqContent } from "./content";
 import { qqbotIdentity } from "./identity";
@@ -10,12 +10,12 @@ export function isQqAddressed(session: Session, mode: Config["receiveMode"] = "m
   return mode === "all" || session.isDirect || !!session.stripped?.appel;
 }
 
-export async function resolveQqBotUid(ctx: Context, session: Session) {
+export async function resolveQqBotUid(ctx: QqAdapterContext, session: Session) {
   const identity = qqbotIdentity(session);
   return identity ? ctx.faithCore.adapter.resolve(identity) : null;
 }
 
-export async function dispatchQqSession(ctx: Context, session: Session, sender: QqSender, normalizedContent = normalizeQqContent(session)) {
+export async function dispatchQqSession(ctx: QqAdapterContext, session: Session, sender: QqSender, normalizedContent = normalizeQqContent(session)) {
   const identity = qqbotIdentity(session);
   if (!identity) {
     await sender.sendText(session, "无法读取你的 QQ 身份，请稍后重试；若持续出现，请检查 QQ Bot 事件权限与适配器版本。");

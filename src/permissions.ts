@@ -1,7 +1,7 @@
-import type { Context } from "koishi";
 import type { Config } from "../config";
+import type { QqAdapterContext } from "./contracts";
 
-export function registerCreatorPolicy(ctx: Context, config: Config) {
+export function registerCreatorPolicy(ctx: QqAdapterContext, config: Config) {
   const identities = [
     ...config.creatorUserOpenids.map((value) => ({ adapter: "qqbot", type: "qqbot_user_openid", value, scope: "private_chat" } as const)),
     ...config.creatorGroupIdentities.map((identity) => ({ adapter: "qqbot", type: "qqbot_member_openid", value: identity.memberOpenid, scope: "group_chat", scopeValue: identity.groupOpenid } as const)),

@@ -1,6 +1,6 @@
 {
   "name": "@mueo/koishi-plugin-cocofaith-adapter-qq",
-  "version": "3.0.0-alpha.2",
+  "version": "3.0.0-alpha.3",
   "description": "CoCoFaith v3 QQ 官方机器人平台接入",
   "author": "Mueo <mueo@mueoo.com>",
   "main": "lib/index.js",
@@ -15,9 +15,10 @@
     "test": "npm run build && node --test tests/*.test.cjs"
   },
   "peerDependencies": {
-    "@mueo/koishi-plugin-cocofaith-core": "^3.0.0-alpha.2",
-    "@mueo/koishi-plugin-cocofaith-business": "^3.0.0-alpha.2",
     "koishi": "^4.16.0"
+  },
+  "dependencies": {
+    "@mueo/cocofaith-sdk": "^3.0.0-alpha.3"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

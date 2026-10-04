@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 3.0.0-alpha.3
+
+- 移除对 Core 与 Business 插件包的构建依赖，公共身份和消息协议统一引用 `@mueo/cocofaith-sdk`。
 - 拆分会话路由和创造者权限注册，精简 Adapter 装配入口。
 - 向 Business 声明 QQ 官方机器人允许注册新 UID。
 - 收敛源码注释，仅保留平台消息额度相关约束。
