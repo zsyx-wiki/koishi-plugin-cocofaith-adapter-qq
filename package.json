@@ -3,6 +3,14 @@
   "version": "3.0.0-alpha.3",
   "description": "CoCoFaith v3 QQ 官方机器人平台接入",
   "author": "Mueo <mueo@mueoo.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zsyx-wiki/koishi-plugin-cocofaith-adapter-qq.git"
+  },
+  "homepage": "https://github.com/zsyx-wiki/koishi-plugin-cocofaith-adapter-qq#readme",
+  "bugs": {
+    "url": "https://github.com/zsyx-wiki/koishi-plugin-cocofaith-adapter-qq/issues"
+  },
   "main": "lib/index.js",
   "module": "lib/index.mjs",
   "typings": "lib/index.d.ts",
@@ -26,6 +34,9 @@
     "typescript": "^5.9.2"
   },
   "license": "GPL-3.0-or-later",
+  "publishConfig": {
+    "access": "public"
+  },
   "koishi": {
     "name": "CoCoFaith Adapter QQ",
     "services": {
