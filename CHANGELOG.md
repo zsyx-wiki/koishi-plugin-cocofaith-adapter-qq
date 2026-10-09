@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 3.0.0-alpha.4
+
+- Business 事件、分发响应和 Adapter 契约统一引用 SDK 的 `protocol` 入口，移除适配器内重复协议定义。
+- test 命令加入类型检查，提供统一源码排版命令；保留被动回复额度、超时丢弃和主动发送授权回归。
+- 显式声明 Koishi 开发依赖；CI 构建对应版本的 SDK 测试实现，分支/PR 检查与发布流程共用依赖准备步骤。
 
 ## 3.0.0-alpha.3
 
