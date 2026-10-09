@@ -1,11 +1,11 @@
 import { Context } from "koishi";
-import { Config as ConfigSchema, type Config as QqConfig } from "../config";
-import { QqMessageSender } from "./messaging/sender";
-import { isCoconutWaterCommand, normalizeQqContent } from "./session/content";
-import { applyCommandPanel } from "./panel";
-import { dispatchQqSession, isQqAddressed } from "./session/router";
-import { registerCreatorPolicy } from "./permissions";
+import { Config as ConfigSchema,type Config as QqConfig } from "../config";
 import type { QqAdapterContext } from "./contracts";
+import { QqMessageSender } from "./messaging/sender";
+import { applyCommandPanel } from "./panel";
+import { registerCreatorPolicy } from "./permissions";
+import { isCoconutWaterCommand,normalizeQqContent } from "./session/content";
+import { dispatchQqSession,isQqAddressed } from "./session/router";
 
 export const name = "cocofaith-adapter-qq";
 export const inject = ["faithCore", "faithBusiness"] as const;
@@ -46,13 +46,13 @@ function assertDependencies(ctx: QqAdapterContext) {
   if (typeof ctx.faithBusiness?.dispatch !== "function") throw new Error("CoCoFaith Adapter QQ 需要已就绪的 faithBusiness 路由服务");
   if (typeof ctx.faithBusiness?.acceptsCommand !== "function") throw new Error("请同步更新 CoCoFaith Business，以提供命令快速筛选接口");
 }
-export * from "./types";
 export type * from "./contracts";
-export * from "./session/identity";
-export * from "./session/content";
-export * from "./session/router";
 export * from "./errors";
 export * from "./messaging/sender";
 export * from "./panel";
 export * from "./permissions";
+export * from "./session/content";
+export * from "./session/identity";
+export * from "./session/router";
+export * from "./types";
 export * from "./version";

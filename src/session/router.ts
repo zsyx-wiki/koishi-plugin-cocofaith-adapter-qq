@@ -1,10 +1,10 @@
 import type { Session } from "koishi";
 import type { Config } from "../../config";
-import type { QqAdapterContext, QqSender } from "../contracts";
+import type { QqAdapterContext,QqSender } from "../contracts";
 import { friendlyBusinessError } from "../errors";
+import { COCOFAITH_QQ_ADAPTER_VERSION } from "../version";
 import { normalizeQqContent } from "./content";
 import { qqbotIdentity } from "./identity";
-import { COCOFAITH_QQ_ADAPTER_VERSION } from "../version";
 
 export function isQqAddressed(session: Session, mode: Config["receiveMode"] = "mention") {
   return mode === "all" || session.isDirect || !!session.stripped?.appel;

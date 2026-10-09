@@ -1,7 +1,7 @@
 {
   "name": "@mueo/koishi-plugin-cocofaith-adapter-qq",
   "version": "3.0.0-alpha.3",
-  "description": "CoCoFaith v3 QQ 官方机器人平台接入",
+  "description": "CoCoFaith v3 QQ \u5b98\u65b9\u673a\u5668\u4eba\u5e73\u53f0\u63a5\u5165",
   "author": "Mueo <mueo@mueoo.com>",
   "repository": {
     "type": "git",
@@ -20,7 +20,9 @@
   "scripts": {
     "build": "tsup",
     "watch": "tsup -w",
-    "test": "npm run build && node --test tests/*.test.cjs"
+    "test": "npm run typecheck && npm run build && node --test tests/*.test.cjs",
+    "format": "node scripts/format-source.cjs src config.ts messages.ts",
+    "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
     "koishi": "^4.16.0"
