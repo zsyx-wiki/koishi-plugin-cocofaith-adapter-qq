@@ -1,6 +1,6 @@
 {
   "name": "koishi-plugin-cocofaith-adapter-qq",
-  "version": "3.0.0-alpha.5",
+  "version": "3.0.0-rc.1",
   "description": "将 CoCoFaith 消息转换为 QQ 平台适配器可用的格式",
   "author": "Mueo <mueo@mueoo.com>",
   "repository": {
@@ -29,7 +29,7 @@
     "@koishijs/plugin-adapter-qq": "^4.0.0"
   },
   "dependencies": {
-    "cocofaith-sdk": "3.0.0-alpha.5"
+    "cocofaith-sdk": "3.0.0-rc.1"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
