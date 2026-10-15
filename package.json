@@ -35,7 +35,8 @@
     "@types/node": "^20.0.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2",
-    "koishi": "^4.16.0"
+    "koishi": "^4.16.0",
+    "prettier": "^3.6.2"
   },
   "license": "GPL-3.0-or-later",
   "publishConfig": {
