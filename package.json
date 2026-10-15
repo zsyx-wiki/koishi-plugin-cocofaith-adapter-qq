@@ -29,7 +29,7 @@
     "@koishijs/plugin-adapter-qq": "^4.0.0"
   },
   "dependencies": {
-    "cocofaith-sdk": "^3.0.0-alpha.5"
+    "cocofaith-sdk": "3.0.0-alpha.5"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

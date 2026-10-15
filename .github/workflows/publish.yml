@@ -24,7 +24,7 @@ jobs:
       - name: Prepare test dependencies
         uses: ./.github/actions/prepare-tests
         with:
-          sdk-ref: v3.0.0-alpha.5
+          published-sdk: "true"
 
       - name: Run tests
         run: npm test
@@ -38,9 +38,12 @@ jobs:
             exit 1
           fi
 
+      - name: Check package contents
+        run: npm pack --dry-run
+
       - name: Publish package
         shell: bash
         run: |
           npm_tag="$(node -p "const version = require('./package.json').version; const prerelease = version.split('-')[1]; prerelease ? prerelease.split('.')[0] : 'latest'")"
-          npm publish --access public --tag "$npm_tag" --provenance
+          npm publish --ignore-scripts --access public --tag "$npm_tag" --provenance
 
