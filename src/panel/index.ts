@@ -1,19 +1,30 @@
 import type { Context } from "koishi";
 
-export interface QqPanelConfig { enabled: boolean; groupId: string; }
+export interface QqPanelConfig {
+  enabled: boolean;
+  groupId: string;
+}
 const REMARK = "faith-v3-command-panel";
 const LEGACY_REMARK = "faith-qq-command-panel";
 export const FAITH_QQ_PANEL_COMMANDS = Object.freeze([
-  ["信仰", "查看信仰信息", false], ["信仰 信息", "查看信仰信息", false], ["信仰 注册", "注册一个信仰", false],
-  ["信仰 弃誓", "变更当前信仰", false], ["信仰 职业", "查看或选择职业", false], ["信仰 变更职业", "付费变更职业", false],
+  ["信仰", "查看信仰信息", false],
+  ["信仰 信息", "查看信仰信息", false],
+  ["信仰 注册", "注册一个信仰", false],
+  ["信仰 弃誓", "变更当前信仰", false],
+  ["信仰 职业", "查看或选择职业", false],
+  ["信仰 变更职业", "付费变更职业", false],
   ["信仰 职业查看", "查看指定信仰的职业", false],
   ["信仰管理 数值", "调整玩家业务数值", true],
-  ["虚空祈求", "消耗金币抽取物品", false], ["虚空祈求 次数", "查看今日祈求次数", false],
+  ["虚空祈求", "消耗金币抽取物品", false],
+  ["虚空祈求 次数", "查看今日祈求次数", false],
   ["称号", "查看称号命令", false],
-  ["容器 查看", "查看神性容器状态", false], ["容器 投入", "向容器投入资源", false],
-  ["容器 觐献", "消耗神性换取觐见分", false], ["容器 从神", "凝聚从神神格", false],
+  ["容器 查看", "查看神性容器状态", false],
+  ["容器 投入", "向容器投入资源", false],
+  ["容器 觐献", "消耗神性换取觐见分", false],
+  ["容器 从神", "凝聚从神神格", false],
   ["容器 真神", "登临命途真神", false],
-  ["真神 设置祷词", "设置自己信仰的祷词", false], ["真神 设置职业", "设置自己信仰的职业", false],
+  ["真神 设置祷词", "设置自己信仰的祷词", false],
+  ["真神 设置职业", "设置自己信仰的职业", false],
   ["关于椰子水", "查看运行架构与版本", false],
 ] as const);
 
@@ -21,29 +32,55 @@ export function applyCommandPanel(ctx: Context, config: QqPanelConfig) {
   if (!config.enabled || !config.groupId) return;
   if (FAITH_QQ_PANEL_COMMANDS.length > 20) throw new Error("QQ 指令面板最多注册 20 条命令");
   validatePanelCommands(FAITH_QQ_PANEL_COMMANDS);
-  const logger = ctx.logger("cocofaith-adapter-qq-panel"), synchronized = new WeakSet<object>(), pending = new WeakMap<object, Promise<void>>();
-  const panel = { remark: REMARK, items: FAITH_QQ_PANEL_COMMANDS.map(([name, desc, only_admin]) => ({ type: "command", name, desc, only_admin })) };
+  const logger = ctx.logger("cocofaith-adapter-qq-panel"),
+    synchronized = new WeakSet<object>(),
+    pending = new WeakMap<object, Promise<void>>();
+  const panel = {
+    remark: REMARK,
+    items: FAITH_QQ_PANEL_COMMANDS.map(([name, desc, only_admin]) => ({
+      type: "command",
+      name,
+      desc,
+      only_admin,
+    })),
+  };
   const sync = (bot: any) => {
     if (!bot || bot.platform !== "qq" || synchronized.has(bot)) return Promise.resolve();
-    const active = pending.get(bot); if (active) return active;
+    const active = pending.get(bot);
+    if (active) return active;
     const task = (async () => {
       try {
         await bot.getAccessToken?.();
         const list = await bot.http.get("/v2/panels", { params: { scope: "group", limit: 50 } });
         const records = list?.records ?? [];
-        const existing = records.find((record: any) => record.panel?.remark === REMARK) ?? records.find((record: any) => record.panel?.remark === LEGACY_REMARK);
+        const existing =
+          records.find((record: any) => record.panel?.remark === REMARK) ??
+          records.find((record: any) => record.panel?.remark === LEGACY_REMARK);
         if (existing) {
           await bot.http.put(`/v2/panels/${existing.panel_id}`, { panel });
-          logger.info(`已更新 QQ 指令面板 ${existing.panel_id}（${FAITH_QQ_PANEL_COMMANDS.length} 项）`);
+          logger.info(
+            `已更新 QQ 指令面板 ${existing.panel_id}（${FAITH_QQ_PANEL_COMMANDS.length} 项）`,
+          );
         } else {
-          const created = await bot.http.post("/v2/panels", { scope: "group", target_type: "specific", group_openids: [config.groupId], panel });
-          logger.info(`已创建 QQ 指令面板 ${created?.panel_id ?? "unknown"}（${FAITH_QQ_PANEL_COMMANDS.length} 项）`);
+          const created = await bot.http.post("/v2/panels", {
+            scope: "group",
+            target_type: "specific",
+            group_openids: [config.groupId],
+            panel,
+          });
+          logger.info(
+            `已创建 QQ 指令面板 ${created?.panel_id ?? "unknown"}（${FAITH_QQ_PANEL_COMMANDS.length} 项）`,
+          );
         }
         synchronized.add(bot);
-      } catch (error) { logger.warn(`同步 QQ 指令面板失败：${formatPanelError(error)}`); }
-      finally { pending.delete(bot); }
+      } catch (error) {
+        logger.warn(`同步 QQ 指令面板失败：${formatPanelError(error)}`);
+      } finally {
+        pending.delete(bot);
+      }
     })();
-    pending.set(bot, task); return task;
+    pending.set(bot, task);
+    return task;
   };
   ctx.on("bot-connect", sync);
   ctx.on("ready", () => Promise.all([...ctx.bots].map(sync)).then(() => undefined));
@@ -63,6 +100,8 @@ function formatPanelError(error: unknown) {
   const value = error as { message?: unknown; response?: { data?: unknown }; code?: unknown };
   const details = value.response?.data;
   let suffix = "";
-  try { if (details !== undefined) suffix = `；QQ 返回：${JSON.stringify(details).slice(0, 800)}`; } catch {}
+  try {
+    if (details !== undefined) suffix = `；QQ 返回：${JSON.stringify(details).slice(0, 800)}`;
+  } catch {}
   return `${typeof value.message === "string" ? value.message : "请求失败"}${value.code ? `（${String(value.code)}）` : ""}${suffix}`;
 }

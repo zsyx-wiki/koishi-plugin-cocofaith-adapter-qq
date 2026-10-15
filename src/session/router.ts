@@ -1,6 +1,6 @@
 import type { Session } from "koishi";
 import type { Config } from "../../config";
-import type { QqAdapterContext,QqSender } from "../contracts";
+import type { QqAdapterContext, QqSender } from "../contracts";
 import { friendlyBusinessError } from "../errors";
 import { COCOFAITH_QQ_ADAPTER_VERSION } from "../version";
 import { normalizeQqContent } from "./content";
@@ -15,10 +15,18 @@ export async function resolveQqBotUid(ctx: QqAdapterContext, session: Session) {
   return identity ? ctx.faithCore.adapter.resolve(identity) : null;
 }
 
-export async function dispatchQqSession(ctx: QqAdapterContext, session: Session, sender: QqSender, normalizedContent = normalizeQqContent(session)) {
+export async function dispatchQqSession(
+  ctx: QqAdapterContext,
+  session: Session,
+  sender: QqSender,
+  normalizedContent = normalizeQqContent(session),
+) {
   const identity = qqbotIdentity(session);
   if (!identity) {
-    await sender.sendText(session, "无法读取你的 QQ 身份，请稍后重试；若持续出现，请检查 QQ Bot 事件权限与适配器版本。");
+    await sender.sendText(
+      session,
+      "无法读取你的 QQ 身份，请稍后重试；若持续出现，请检查 QQ Bot 事件权限与适配器版本。",
+    );
     return true;
   }
   const response = await ctx.faithBusiness.dispatch({
@@ -30,7 +38,11 @@ export async function dispatchQqSession(ctx: QqAdapterContext, session: Session,
     roomKey: JSON.stringify(["qq", session.selfId, session.channelId]),
     eventId: session.messageId,
     displayName: session.username,
-    adapter: { name: "CoCoFaith Adapter QQ", version: COCOFAITH_QQ_ADAPTER_VERSION, allowRegistration: true },
+    adapter: {
+      name: "CoCoFaith Adapter QQ",
+      version: COCOFAITH_QQ_ADAPTER_VERSION,
+      allowRegistration: true,
+    },
     reply: (result) => sender.sendResult(session, result),
   });
   if (!response.matched) return false;
