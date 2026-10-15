@@ -265,3 +265,37 @@ test('ESM artifact loads in an isolated Node host', () => {
   const result = spawnSync(process.execPath, ['--input-type=module', '-e', `await import(${JSON.stringify(target)})`], { encoding: 'utf8' })
   assert.equal(result.status, 0, result.stderr)
 })
+
+test("disposal suppresses image fallback after an in-flight send fails", async () => {
+  let release, entered;
+  const ready = new Promise((resolve) => {
+    entered = resolve;
+  });
+  const pending = new Promise((_, reject) => {
+    release = reject;
+  });
+  const sender = new qq.QqMessageSender({ logger: () => ({ warn() {} }) });
+  let attempts = 0;
+  const session = {
+    isDirect: true,
+    messageId: "image-dispose",
+    userId: "user",
+    channelId: "channel",
+    bot: { internal: {} },
+    send: async () => {
+      attempts++;
+      entered();
+      await pending;
+    },
+  };
+  const execution = sender.sendResult(session, {
+    type: "image",
+    url: "https://example.com/image.png",
+    fallback: "fallback",
+  });
+  await ready;
+  sender.dispose();
+  release(new Error("image failed"));
+  await execution;
+  assert.equal(attempts, 1);
+});

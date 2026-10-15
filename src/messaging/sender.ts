@@ -103,6 +103,7 @@ export class QqMessageSender implements QqSender {
       try {
         return await session.send(h.image(url));
       } catch (error) {
+        if (!this.canDeliver(session, options)) return;
         if (fallback) return session.send(fallback);
         throw error;
       }
