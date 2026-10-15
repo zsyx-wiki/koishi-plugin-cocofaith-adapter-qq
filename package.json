@@ -1,7 +1,7 @@
 {
-  "name": "@mueo/koishi-plugin-cocofaith-adapter-qq",
-  "version": "3.0.0-alpha.4",
-  "description": "CoCoFaith v3 QQ 官方机器人平台接入",
+  "name": "koishi-plugin-cocofaith-adapter-qq",
+  "version": "3.0.0-alpha.5",
+  "description": "将 CoCoFaith 消息转换为 QQ 平台适配器可用的格式",
   "author": "Mueo <mueo@mueoo.com>",
   "repository": {
     "type": "git",
@@ -25,10 +25,11 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "koishi": "^4.16.0"
+    "koishi": "^4.16.0",
+    "@koishijs/plugin-adapter-qq": "^4.0.0"
   },
   "dependencies": {
-    "@mueo/cocofaith-sdk": "^3.0.0-alpha.4"
+    "cocofaith-sdk": "^3.0.0-alpha.5"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
@@ -42,11 +43,14 @@
   },
   "koishi": {
     "name": "CoCoFaith Adapter QQ",
-    "services": {
-      "required": [
-        "faithCore",
-        "faithBusiness"
+    "service": {
+      "required": [],
+      "implements": [
+        "faithAdapter"
       ]
+    },
+    "description": {
+      "zh-CN": "将 CoCoFaith 消息转换为 QQ 平台适配器可用的格式"
     }
   }
 }

@@ -5,7 +5,7 @@
 
   <p>
     <img alt="Koishi" src="https://img.shields.io/badge/Koishi-4.16%2B-60a5fa?style=flat-square">
-    <img alt="Version" src="https://img.shields.io/badge/version-3.0.0--alpha.4-a78bfa?style=flat-square">
+    <img alt="Version" src="https://img.shields.io/badge/version-3.0.0--alpha.5-a78bfa?style=flat-square">
     <img alt="License" src="https://img.shields.io/badge/License-GPL--3.0-52b788?style=flat-square">
     <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5.9-3178c6?style=flat-square&logo=typescript&logoColor=white">
   </p>
@@ -15,14 +15,19 @@
 
 把 QQ 官方机器人消息交给 CoCoFaith Business，支持 Markdown 回复、纯文本降级和群指令面板。
 
+需要先启用 `@koishijs/plugin-adapter-qq`，由它负责机器人连接。插件配置界面会显示此依赖。
+
 ## 安装
 
 ```sh
-npm install @mueo/koishi-plugin-cocofaith-core@alpha @mueo/koishi-plugin-cocofaith-business@alpha @mueo/koishi-plugin-cocofaith-adapter-qq@alpha
+npm install koishi-plugin-cocofaith@alpha koishi-plugin-cocofaith-adapter-qq@alpha
 ```
 
-先配置 Koishi 的 `adapter-qq` 机器人连接，添加 Core、Business，
-再添加 `@mueo/cocofaith-adapter-qq`。
+先启用数据库并配置 Koishi 的 `adapter-qq` 机器人连接，添加 `cocofaith`，
+再添加 `cocofaith-adapter-qq`。
+
+启用时提供 `faithAdapter` 服务，CoCoFaith 据此检查是否已配置接入。QQ 与 OneBot 可以同时启用。
+消息处理在 `faithCore`、`faithBusiness` 就绪后启动；兼容服务实现也可使用本 Adapter。
 
 ## 配置
 

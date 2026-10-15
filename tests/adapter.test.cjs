@@ -48,8 +48,8 @@ test('panel contains Faith tree before Void Prayer tree and remains below offici
   assert.ok(qq.FAITH_QQ_PANEL_COMMANDS.length <= 20)
   assert.deepEqual(qq.FAITH_QQ_PANEL_COMMANDS.map((item) => item[0]), [
     '信仰', '信仰 信息', '信仰 注册', '信仰 弃誓', '信仰 职业', '信仰 变更职业',
-    '信仰管理 数值', '虚空祈求', '虚空祈求 次数', '称号',
-    '容器 查看', '容器 投入', '容器 觐献', '容器 从神', '容器 真神', '关于椰子水',
+    '信仰 职业查看', '信仰管理 数值', '虚空祈求', '虚空祈求 次数', '称号',
+    '容器 查看', '容器 投入', '容器 觐献', '容器 从神', '容器 真神', '真神 设置祷词', '真神 设置职业', '关于椰子水',
   ])
 })
 
@@ -79,6 +79,8 @@ test('receive mode defaults to mention and validates choices', () => {
 test('all mode filters chat before identity lookup and accepts unmentioned commands', async () => {
   let middleware, resolved = 0, dispatched = 0, next = 0
   const ctx = {
+    plugin(Plugin, info) { const registry = new Plugin({ set() {} }); registry.fork(this, info) },
+    inject(dependencies, apply) { apply(this) },
     logger: () => ({ info() {}, warn() {}, error() {} }), on() {},
     middleware(fn) { middleware = fn },
     faithCore: {
@@ -104,6 +106,8 @@ test('all mode filters chat before identity lookup and accepts unmentioned comma
 test('binding mode accepts only Coconut Water commands from groups', async () => {
   let middleware, resolved = 0, dispatched = 0, next = 0
   const ctx = {
+    plugin(Plugin, info) { const registry = new Plugin({ set() {} }); registry.fork(this, info) },
+    inject(dependencies, apply) { apply(this) },
     logger: () => ({ info() {}, warn() {}, error() {} }), on() {},
     middleware(fn) { middleware = fn },
     faithCore: {
@@ -215,4 +219,49 @@ test('expired replies are discarded unless Business and Adapter both allow proac
   assert.equal(payloads.length, 1)
   assert.equal(payloads[0].event_id, undefined)
   assert.equal(payloads[0].msg_id, undefined)
+})
+
+
+test('adapter advertises faithAdapter before business exists and releases injected handlers on unload', async () => {
+  const { App } = require('koishi')
+  const app = new App()
+  const baseline = app.$processor._hooks.length
+  const fork = app.plugin(qq, { mode: 'normal', commandPanel: { enabled: false } })
+  await app.start()
+  assert.equal(app.faithAdapter.has('qq'), true)
+  assert.equal(app.$processor._hooks.length, baseline)
+  let released = 0
+  const services = app.plugin({ name: 'compatible-services', apply(ctx) {
+    ctx.set('faithCore', {
+      adapter: { resolve: async () => null },
+      permissions: { register: () => ({ dispose() { released++ } }) },
+    })
+    ctx.set('faithBusiness', { acceptsCommand: () => false, dispatch: async () => ({ matched: false }) })
+    if (!ctx.get('database')) ctx.set('database', { getAssignedChannels: async () => [] })
+  } })
+  await app.events.flush()
+  assert.equal(app.$processor._hooks.length, baseline + 1)
+  fork.update({ mode: 'binding', commandPanel: { enabled: false } })
+  await app.events.flush()
+  assert.equal(app.faithAdapter.list()[0].mode, 'binding')
+  assert.equal(app.$processor._hooks.length, baseline + 1)
+  services.dispose()
+  await app.events.flush()
+  assert.equal(app.faithAdapter.has('qq'), true)
+  assert.equal(app.$processor._hooks.length, baseline)
+  fork.dispose()
+  await app.events.flush()
+  assert.equal(app.faithAdapter, undefined)
+  assert.equal(app.$processor._hooks.length, baseline)
+  await app.stop()
+})
+
+
+test('ESM artifact loads in an isolated Node host', () => {
+  const { spawnSync } = require('node:child_process')
+  const { pathToFileURL } = require('node:url')
+  const path = require('node:path')
+  const target = pathToFileURL(path.resolve(__dirname, '../lib/index.mjs')).href
+  const result = spawnSync(process.execPath, ['--input-type=module', '-e', `await import(${JSON.stringify(target)})`], { encoding: 'utf8' })
+  assert.equal(result.status, 0, result.stderr)
 })

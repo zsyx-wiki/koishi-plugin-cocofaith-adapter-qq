@@ -24,7 +24,7 @@ jobs:
       - name: Prepare test dependencies
         uses: ./.github/actions/prepare-tests
         with:
-          sdk-ref: v3.0.0-alpha.4
+          sdk-ref: v3.0.0-alpha.5
 
       - name: Run tests
         run: npm test

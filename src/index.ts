@@ -1,3 +1,5 @@
+import { COCOFAITH_QQ_ADAPTER_VERSION } from "./version";
+import { provideFaithAdapter } from "cocofaith-sdk/adapter";
 import { Context } from "koishi";
 import { Config as ConfigSchema,type Config as QqConfig } from "../config";
 import type { QqAdapterContext } from "./contracts";
@@ -8,11 +10,19 @@ import { isCoconutWaterCommand,normalizeQqContent } from "./session/content";
 import { dispatchQqSession,isQqAddressed } from "./session/router";
 
 export const name = "cocofaith-adapter-qq";
-export const inject = ["faithCore", "faithBusiness"] as const;
+export const inject = [] as const;
 export const Config = ConfigSchema;
 export type Config = QqConfig;
 
 export function apply(ctx: Context, config: Config) {
+  provideFaithAdapter(ctx, {
+    id: name, name: "CoCoFaith Adapter QQ", platform: "qq",
+    version: COCOFAITH_QQ_ADAPTER_VERSION, mode: config.mode ?? "binding",
+  });
+  ctx.inject(["faithCore", "faithBusiness"], ctx => applyTransport(ctx, config));
+}
+
+function applyTransport(ctx: Context, config: Config) {
   const services = ctx as QqAdapterContext;
   assertDependencies(services);
   const logger = ctx.logger("cocofaith-adapter-qq");
